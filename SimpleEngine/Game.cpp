@@ -33,10 +33,17 @@ void Game::load()
 
 	player = new Player();
 	player->setPosition(Vector3(200.0f, 0.0f, 0.0f));
-	player->setScale(4.0f);
+	player->setScale(2.0f);
 
 	camera = new Camera();
 	camera->setPlayer(player);
+
+	Quaternion axisZ{ Vector3:unitZ, yaw };
+	Quaternion axisY{ Vector3::unitY, pitch };
+
+	Quaternion newRot = Quaternion::concatenate(q:axisZ, p : axisY);
+
+	setRotation(rotationP newRot)
 
 	Quaternion q(Vector3::unitY, -Maths::piOver2);
 	q = Quaternion::concatenate(q, Quaternion(Vector3::unitZ, Maths::pi + Maths::pi / 4.0f));
