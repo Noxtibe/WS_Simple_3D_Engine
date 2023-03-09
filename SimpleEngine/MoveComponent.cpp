@@ -19,6 +19,11 @@ void MoveComponent::setAngularSpeed(float angularSpeedP)
 	angularSpeed = angularSpeedP;
 }
 
+void MoveComponent::setStrafeSpeed(float strafeSpeedP)
+{
+	strafeSpeed = strafeSpeedP;
+}
+
 void MoveComponent::update(float dt)
 {
 	if (!Maths::nearZero(angularSpeed))
@@ -29,9 +34,12 @@ void MoveComponent::update(float dt)
 		newRotation = Quaternion::concatenate(newRotation, increment);
 		owner.setRotation(newRotation);
 	}
-	if (!Maths::nearZero(forwardSpeed))
+	if (!Maths::nearZero(forwardSpeed) || !Maths::nearZero(strafeSpeed))
 	{
-		Vector3 newPosition = owner.getPosition() + owner.getForward() * forwardSpeed * dt;
+		//Vector3 newPosition = owner.getPosition() + owner.getForward() * forwardSpeed * dt;
+		Vector3 newPosition = owner.getPosition();
+		newPosition += owner.getForward() * forwardSpeed * dt;
+		newPosition += owner.getRight() * strafeSpeed * dt;
 		owner.setPosition(newPosition);
 	}
 }

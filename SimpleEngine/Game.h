@@ -7,6 +7,7 @@
 #include "RendererOGL.h"
 #include "Camera.h"
 #include "Player.h"
+#include "InputManager.h"
 
 using std::vector;
 
@@ -42,6 +43,10 @@ public:
 	void removeActor(Actor* actor);
 	RendererOGL& getRenderer() { return renderer; }
 
+	// Camera
+	void changeCamera(int mode);
+	Camera* getCamera() { return camera; }
+
 private:
 
 	void processInput();
@@ -51,6 +56,7 @@ private:
 	bool isRunning;
 	Window window;
 	RendererOGL renderer;
+	InputManager inputManager;
 
 	bool isUpdatingActors;
 	vector<Actor*> actors;

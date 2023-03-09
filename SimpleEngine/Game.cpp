@@ -11,11 +11,13 @@ bool Game::initialize()
 {
 	bool isWindowInit = window.initialize();
 	bool isRendererInit = renderer.initialize(window);
+	bool isInputInit = inputManager.initialize();
 	return isWindowInit && isRendererInit; // Return bool && bool && bool ...to detect error
 }
 
 void Game::load()
 {
+	inputManager.setMouseRelativeMode(true);
 	Assets::loadShader("Res\\Shaders\\Sprite.vert", "Res\\Shaders\\Sprite.frag", "", "", "", "Sprite");
 	Assets::loadShader("Res\\Shaders\\BasicMesh.vert", "Res\\Shaders\\BasicMesh.frag", "", "", "", "BasicMesh");
 	Assets::loadShader("Res\\Shaders\\Phong.vert", "Res\\Shaders\\Phong.frag", "", "", "", "Phong");
@@ -33,7 +35,7 @@ void Game::load()
 
 	player = new Player();
 	player->setPosition(Vector3(200.0f, 0.0f, 0.0f));
-	player->setScale(2.0f);
+	player->setScale(4.0f);
 
 	camera = new Camera();
 	camera->setPlayer(player);
@@ -116,21 +118,37 @@ void Game::load()
 	sc = new SpriteComponent(ui, Assets::getTexture("Radar"));
 }
 
+void Game::changeCamera(int mode)
+{
+	camera->setRotation(false);
+
+	switch (mode)
+	{
+	case 3:
+		camera->setRotation(true);
+		break;
+	}
+}
+
 void Game::processInput()
 {
+	inputManager.preUpdate();
+
 	// SDL Event
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
-		switch (event.type)
+		/*switch (event.type)
 		{
 		case SDL_QUIT:
 			isRunning = false;
 			break;
-		}
+		}*/
+		isRunning = inputManager.processEvent(event);
 	}
-	// Keyboard state
-	const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
+
+	// Old Keyboard state
+	/*const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
 	// Escape: quit game
 	if (keyboardState[SDL_SCANCODE_ESCAPE])
 	{
@@ -141,6 +159,29 @@ void Game::processInput()
 	for (auto actor : actors)
 	{
 		actor->processInput(keyboardState);
+	}
+	isUpdatingActors = false;*/
+
+	inputManager.update();
+	const InputState& input = inputManager.getInputState();
+
+	// Escape: quit game
+	if (input.keyboard.getKeyState(SDL_SCANCODE_ESCAPE) == ButtonState::Released)
+	{
+		isRunning = false;
+	}
+
+	// Switch camera
+	if (input.keyboard.getKeyState(SDL_SCANCODE_1) == ButtonState::Pressed)
+		changeCamera(1);
+	else if (input.keyboard.getKeyState(SDL_SCANCODE_2) == ButtonState::Pressed)
+		changeCamera(2);
+
+	// Actor input
+	isUpdatingActors = true;
+	for (auto actor : actors)
+	{
+		actor->processInput(input);
 	}
 	isUpdatingActors = false;
 }
@@ -214,6 +255,7 @@ void Game::unload()
 
 void Game::close()
 {
+	inputManager.close();
 	renderer.close();
 	window.close();
 	SDL_Quit();
