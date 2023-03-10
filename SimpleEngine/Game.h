@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Player.h"
 #include "InputManager.h"
+#include "Achievements.h"
 
 using std::vector;
 
@@ -46,6 +47,7 @@ public:
 	// Camera
 	void changeCamera(int mode);
 	Camera* getCamera() { return camera; }
+	Player* getPlayer() { return player; }
 
 private:
 
@@ -61,7 +63,9 @@ private:
 	bool isUpdatingActors;
 	vector<Actor*> actors;
 	vector<Actor*> pendingActors;
+
 	Player* player;
 	Camera* camera;
+	Achievements* achievement;
 };
 

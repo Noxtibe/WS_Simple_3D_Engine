@@ -3,7 +3,8 @@
 enum class Event
 {
 	FIRST_EXPLORATION,
-	I_SEE_YOU
+	I_SEE_YOU,
+	INTO_THE_MIND
 };
 
 class Observer

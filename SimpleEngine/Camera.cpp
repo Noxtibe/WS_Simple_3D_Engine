@@ -8,6 +8,7 @@ Camera::Camera() : Actor(), moveComponent(nullptr), player(nullptr)
 	//moveComponent = new MoveComponent(this);
 
 	up = Vector3::unitZ;
+	setPosition(Vector3(0.0f, 0.0f, -100.0f));
 
 	// Orbit Cam
 
@@ -17,10 +18,15 @@ Camera::Camera() : Actor(), moveComponent(nullptr), player(nullptr)
 
 	// Follow Cam
 
-	horizontalDist = 350.0f;
+	horizontalDist = 400.0f;
 	verticalDist = 150.0f;
 	targetDist = 150.0f;
 	springConst = 64.0f;
+
+	// First Person Cam
+
+	maxPitch = Maths::pi / 3.0f;
+	pitch = 0.0f;
 
 }
 
@@ -38,9 +44,6 @@ void Camera::updateActor(float deltaTime)
 
 	if (rotation)
 	{
-		// Achievement
-		notify(Event::FIRST_EXPLORATION);
-
 		Quaternion yaw{ Vector3::unitZ, yawMovement * deltaTime };
 		offset = Vector3::transform(offset, yaw);
 		up = Vector3::transform(up, yaw);
@@ -63,15 +66,29 @@ void Camera::updateActor(float deltaTime)
 	
 	if (followCam)
 	{
-		// Achievement
-		notify(Event::I_SEE_YOU);
+		float dampening = 2.0f * Maths::sqrt(springConst);
+		Vector3 idealPosition = calculateCamPos();
+		Vector3 diff = actualPos - idealPosition;
+		Vector3 accel = -springConst * diff - dampening * velocity;
+		velocity += accel * deltaTime;
+		actualPos += velocity * deltaTime;
 
-		cameraPos = getPosition();
-		target = player->getPosition();
-		up = Vector3::unitZ;
+		cameraPos = actualPos;
+		target = player->getPosition() + player->getForward() * targetDist;
+	}
 
-		setPosition(player->getPosition() - player->getForward() * 100.0f);
-		setPosition(Vector3(getPosition().x, getPosition().y, 100.0f));
+	// First Person Cam
+
+	if (firstPersonCam)
+	{
+		cameraPos = player->getPosition() + Vector3(0.0f, 0.0f, 50.0f);
+		pitch += pitchMovement * deltaTime;
+		pitch = Maths::clamp(pitch, -maxPitch, maxPitch);
+		Quaternion q{ player->getRight(), pitch };
+		Vector3 viewForward = Vector3::transform(player->getForward(), q);
+
+		target = cameraPos + viewForward * 100.0f;
+		up = Vector3::transform(Vector3::unitZ, q);
 	}
 
 	// Matrix view
@@ -118,7 +135,7 @@ void Camera::actorInput(const struct InputState& inputState)
 		float x = mousePosition.x;
 		float y = mousePosition.y;
 
-		if (inputState.mouse.getButtonState(3) == ButtonState::Held && rotation)
+		if (rotation)
 		{
 			const float maxMouseSpeed = 600.0f;
 			const float maxOrbitSpeed = Maths::pi * 8;
@@ -155,6 +172,11 @@ void Camera::setYawMovement(float newYawMovement)
 void Camera::setRotation(float newRotation)
 {
 	rotation = newRotation;
+	// Achievement
+	if (rotation)
+	{
+		notify(Event::FIRST_EXPLORATION);
+	}
 }
 
 void Camera::snappingFollowCam()
@@ -190,6 +212,28 @@ void Camera::setSpringConst(float springConstP)
 void Camera::setFollowCam(bool followCamP)
 {
 	followCam = followCamP;
+	// Achievement
+	if (followCam)
+	{
+		notify(Event::I_SEE_YOU);
+	}
+	snappingFollowCam();
+	up = Vector3::unitZ;
+}
+
+void Camera::setMaxPitch(float pitch)
+{
+	maxPitch = pitch;
+}
+
+void Camera::setFirstPersonCam(bool firstPersonCamP)
+{
+	firstPersonCam = firstPersonCamP;
+	// Achievement
+	if (firstPersonCam)
+	{
+		notify(Event::INTO_THE_MIND);
+	}
 }
 
 Vector3 Camera::calculateCamPos() const

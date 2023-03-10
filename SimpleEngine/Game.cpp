@@ -18,6 +18,7 @@ bool Game::initialize()
 void Game::load()
 {
 	inputManager.setMouseRelativeMode(true);
+
 	Assets::loadShader("Res\\Shaders\\Sprite.vert", "Res\\Shaders\\Sprite.frag", "", "", "", "Sprite");
 	Assets::loadShader("Res\\Shaders\\BasicMesh.vert", "Res\\Shaders\\BasicMesh.frag", "", "", "", "BasicMesh");
 	Assets::loadShader("Res\\Shaders\\Phong.vert", "Res\\Shaders\\Phong.frag", "", "", "", "Phong");
@@ -37,8 +38,12 @@ void Game::load()
 	player->setPosition(Vector3(200.0f, 0.0f, 0.0f));
 	player->setScale(4.0f);
 
+	achievement = new Achievements();
+
 	camera = new Camera();
 	camera->setPlayer(player);
+	camera->addObserver(achievement);
+	camera->snappingFollowCam();
 
 	//Quaternion axisZ{ Vector3:unitZ, yaw };
 	//Quaternion axisY{ Vector3::unitY, pitch };
@@ -121,11 +126,19 @@ void Game::load()
 void Game::changeCamera(int mode)
 {
 	camera->setRotation(false);
+	camera->setFollowCam(false);
+	camera->setFirstPersonCam(false);
 
 	switch (mode)
 	{
-	case 3:
+	case 1:
 		camera->setRotation(true);
+		break;
+	case 2:
+		camera->setFollowCam(true);
+		break;
+	case 3:
+		camera->setFirstPersonCam(true);
 		break;
 	}
 }
@@ -176,6 +189,8 @@ void Game::processInput()
 		changeCamera(1);
 	else if (input.keyboard.getKeyState(SDL_SCANCODE_2) == ButtonState::Pressed)
 		changeCamera(2);
+	else if (input.keyboard.getKeyState(SDL_SCANCODE_3) == ButtonState::Pressed)
+		changeCamera(3);
 
 	// Actor input
 	isUpdatingActors = true;

@@ -5,7 +5,7 @@
 #include "Sphere.h"
 #include "Assets.h"
 
-Player::Player() : Actor()//, moveComponent(nullptr)
+Player::Player() : Actor(), moveComponent(nullptr)
 {
 	moveComponent = new MoveComponent(this);
 	playerSphere = new MeshComponent(this);
@@ -58,49 +58,79 @@ void Player::actorInput(const struct InputState& inputState)
 {
 	float forwardSpeed = 0.0f;
 	float angularSpeed = 0.0f;
+	float strafeSpeed = 0.0f;
+
 	// wasd movement
 	if (inputState.keyboard.getKeyValue(SDL_SCANCODE_W))
 	{
-		forwardSpeed += 300.0f;
+		forwardSpeed += 500.0f;
 	}
 	if (inputState.keyboard.getKeyValue(SDL_SCANCODE_S))
 	{
-		forwardSpeed -= 300.0f;
+		forwardSpeed -= 500.0f;
 	}
 	if (inputState.keyboard.getKeyValue(SDL_SCANCODE_A))
 	{
-		angularSpeed -= sensitiveRota;
+		if(getGame().getCamera()->getFirstPersonCam())
+		{
+			strafeSpeed -= 250.0f;
+		}
+		else
+		{
+			angularSpeed -= sensitiveRota;
+		}	
 	}
 	if (inputState.keyboard.getKeyValue(SDL_SCANCODE_D))
 	{
-		angularSpeed += sensitiveRota;
+		if (getGame().getCamera()->getFirstPersonCam())
+		{
+			strafeSpeed += 250.0f;
+		}
+		else
+		{
+			angularSpeed += sensitiveRota;
+		}
 	}
 
 	moveComponent->setForwardSpeed(forwardSpeed);
 	moveComponent->setAngularSpeed(angularSpeed);
+	moveComponent->setStrafeSpeed(strafeSpeed);
 
-	/*Vector2 mousePosition = inputState.mouse.getPosition();
-	float x = mousePosition.x;
-	float y = mousePosition.y;
-	if (inputState.mouse.getButtonState(3) == ButtonState::Held)
+	if (!Maths::nearZero(forwardSpeed))
 	{
+		getGame().getCamera()->setHorizontalDist(400.0f);
+	}	
+	else
+	{
+		getGame().getCamera()->setHorizontalDist(300.0f);
+	}	
+
+
+	if (getGame().getCamera()->getFirstPersonCam())
+	{
+		Vector2 mousePosition = inputState.mouse.getPosition();
+		float x = mousePosition.x;
+		float y = mousePosition.y;
+
 		const float maxMouseSpeed = 500.0f;
-		const float maxOrbitSpeed = Maths::pi * 8;
-		float newYawSpeed = 0.0f;
-		if (!Maths::nearZero(x))
+		const float maxAngularSpeed = Maths::pi * 8;
+
+		float angularSpeed = 0.0f;
+		if (x != 0)
 		{
-			newYawMovement = x / maxMouseSpeed;
-			newYawMovement *= maxOrbitSpeed;
+			angularSpeed = x / maxMouseSpeed;
+			angularSpeed *= maxAngularSpeed;
 		}
-		getGame().getCamera()->setYawMovement(newYawMovement);
-		//yawMovement = newYawMovement;
-		float newPitchMovement = 0.0f;
-		if (!Maths::nearZero(y))
+		moveComponent->setAngularSpeed(angularSpeed);
+
+		const float maxPitchMovement = Maths::pi * 8;
+		float pitchMovement = 0.0f;
+		if (y != 0)
 		{
-			newPitchMovement = y / maxMouseSpeed;
-			newPitchMovement *= maxOrbitSpeed;
+			pitchMovement = y / maxMouseSpeed;
+			pitchMovement *= maxPitchMovement;
 		}
-		getGame().getCamera()->setPitchMovement(newPitchMovement);
-		pitchMovement = newPitchMovement;
-	}*/
+		getGame().getCamera()->setPitchMovement(pitchMovement);
+	}
+	
 }

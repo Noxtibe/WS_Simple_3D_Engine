@@ -34,6 +34,15 @@ public:
 	void setSpringConst(float springConstP);
 	void setFollowCam(bool followCamP);
 
+	// Setters First Person Cam
+	void setMaxPitch(float pitch);
+	void setFirstPersonCam(bool firstPersonCamP);
+
+	// Getters First Person Camera
+	float getPitch() const { return pitch; }
+	float getMaxPitch() const { return maxPitch; }
+	bool getFirstPersonCam() const { return firstPersonCam; }
+
 private:
 
 	class MoveComponent* moveComponent;
@@ -54,6 +63,11 @@ private:
 	float verticalDist;
 	float targetDist;
 	float springConst;
+
+	// First Person Cam
+	bool firstPersonCam = false;
+	float maxPitch;
+	float pitch;
 
 	Vector3 offset;
 	Vector3 up;
