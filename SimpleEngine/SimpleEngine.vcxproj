@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Achievements.cpp" />
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="AnimSpriteComponent.cpp" />
     <ClCompile Include="Assets.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="SpriteComponent.cpp" />
+    <ClCompile Include="Subject.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Vector2.cpp" />
@@ -173,6 +175,7 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Achievements.h" />
     <ClInclude Include="Actor.h" />
     <ClInclude Include="AnimSpriteComponent.h" />
     <ClInclude Include="Assets.h" />
@@ -209,6 +212,7 @@
     <ClInclude Include="Ship.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="SpriteComponent.h" />
+    <ClInclude Include="Subject.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Vector2.h" />

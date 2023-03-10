@@ -2,10 +2,26 @@
 #include "MoveComponent.h"
 #include "Game.h"
 
-Camera::Camera() : Actor(), moveComponent(nullptr), player(nullptr), offset(-500.0f, 0.0f, 0.0f), up(Vector3::unitZ), pitchMovement(0.0f), yawMovement(0.0f)
+Camera::Camera() : Actor(), moveComponent(nullptr), player(nullptr)
 {
 	// Old function
 	//moveComponent = new MoveComponent(this);
+
+	up = Vector3::unitZ;
+
+	// Orbit Cam
+
+	offset = Vector3(-500.0f, 0.0f, 0.0f);
+	pitchMovement = 0.0f;
+	yawMovement = 0.0f;
+
+	// Follow Cam
+
+	horizontalDist = 350.0f;
+	verticalDist = 150.0f;
+	targetDist = 150.0f;
+	springConst = 64.0f;
+
 }
 
 void Camera::updateActor(float deltaTime)
@@ -13,27 +29,18 @@ void Camera::updateActor(float deltaTime)
 	Actor::updateActor(deltaTime);
 
 	// Compute new camera from this actor (first test & base values)
+
 	Vector3 cameraPos = getPosition();
 	Vector3 target = player->getPosition();
-
-	// To do with the first test
-	/*Vector3 up = Vector3::unitZ;
-	setPosition(player->getPosition() - player->getForward() * 100.0f);
-	setPosition(Vector3(getPosition().x, getPosition().y, 100.0f));*/
-
-	// Follow Cam
-
-	/*Vector3 cameraPos = getPosition();
-	Vector3 target = player->getPosition();
-	Vector3 up = Vector3::unitZ;
-	setPosition(player->getPosition() - player->getForward() * 100.0f);
-	setPosition(Vector3(getPosition().x, getPosition().y, 100.0f));*/
 
 
 	// Orbit Cam
 
-	if(rotation)
+	if (rotation)
 	{
+		// Achievement
+		notify(Event::FIRST_EXPLORATION);
+
 		Quaternion yaw{ Vector3::unitZ, yawMovement * deltaTime };
 		offset = Vector3::transform(offset, yaw);
 		up = Vector3::transform(up, yaw);
@@ -49,6 +56,22 @@ void Camera::updateActor(float deltaTime)
 
 		target = player->getPosition();
 		cameraPos = target + offset;
+	}
+
+	// Follow cam
+	// Calculate new camera
+	
+	if (followCam)
+	{
+		// Achievement
+		notify(Event::I_SEE_YOU);
+
+		cameraPos = getPosition();
+		target = player->getPosition();
+		up = Vector3::unitZ;
+
+		setPosition(player->getPosition() - player->getForward() * 100.0f);
+		setPosition(Vector3(getPosition().x, getPosition().y, 100.0f));
 	}
 
 	// Matrix view
@@ -89,7 +112,34 @@ void Camera::updateActor(float deltaTime)
 
 void Camera::actorInput(const struct InputState& inputState)
 {
+	if (rotation)
+	{
+		Vector2 mousePosition = inputState.mouse.getPosition();
+		float x = mousePosition.x;
+		float y = mousePosition.y;
 
+		if (inputState.mouse.getButtonState(3) == ButtonState::Held && rotation)
+		{
+			const float maxMouseSpeed = 600.0f;
+			const float maxOrbitSpeed = Maths::pi * 8;
+
+			float newYawMovement = 0.0f;
+			if (!Maths::nearZero(x))
+			{
+				newYawMovement = x / maxMouseSpeed;
+				newYawMovement *= maxOrbitSpeed;
+			}
+			yawMovement = newYawMovement;
+
+			float newPitchMovement = 0.0f;
+			if (!Maths::nearZero(y))
+			{
+				newPitchMovement = y / maxMouseSpeed;
+				newPitchMovement *= maxOrbitSpeed;
+			}
+			pitchMovement = newPitchMovement;
+		}
+	}
 }
 
 void Camera::setPitchMovement(float newPitchMovement)
@@ -105,4 +155,47 @@ void Camera::setYawMovement(float newYawMovement)
 void Camera::setRotation(float newRotation)
 {
 	rotation = newRotation;
+}
+
+void Camera::snappingFollowCam()
+{
+	actualPos = calculateCamPos();
+	velocity = Vector3::zero;
+	Vector3 target = player->getPosition() + player->getPosition() * targetDist;
+
+	Matrix4 view = Matrix4::createLookAt(actualPos, target, Vector3::unitZ);
+	getGame().getRenderer().setViewMatrix(view);
+}
+
+void Camera::setHorizontalDist(float distance)
+{
+	horizontalDist = distance;
+}
+
+void Camera::setVerticalDist(float distance)
+{
+	verticalDist = distance;
+}
+
+void Camera::setTargetDist(float distance)
+{
+	targetDist = distance;
+}
+
+void Camera::setSpringConst(float springConstP)
+{
+	springConst = springConstP;
+}
+
+void Camera::setFollowCam(bool followCamP)
+{
+	followCam = followCamP;
+}
+
+Vector3 Camera::calculateCamPos() const
+{
+	Vector3 camPos = player->getPosition();
+	camPos -= player->getForward() * horizontalDist;
+	camPos += Vector3::unitZ * verticalDist;
+	return camPos;
 }

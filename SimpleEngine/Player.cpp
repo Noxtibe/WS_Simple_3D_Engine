@@ -7,7 +7,7 @@
 
 Player::Player() : Actor()//, moveComponent(nullptr)
 {
-	//moveComponent = new MoveComponent(this);
+	moveComponent = new MoveComponent(this);
 	playerSphere = new MeshComponent(this);
 	playerSphere->setMesh(Assets::getMesh("Mesh_Sphere"));
 }
@@ -56,8 +56,30 @@ Player::Player() : Actor()//, moveComponent(nullptr)
 
 void Player::actorInput(const struct InputState& inputState)
 {
-	/*
-	Vector2 mousePosition = inputState.mouse.getPosition();
+	float forwardSpeed = 0.0f;
+	float angularSpeed = 0.0f;
+	// wasd movement
+	if (inputState.keyboard.getKeyValue(SDL_SCANCODE_W))
+	{
+		forwardSpeed += 300.0f;
+	}
+	if (inputState.keyboard.getKeyValue(SDL_SCANCODE_S))
+	{
+		forwardSpeed -= 300.0f;
+	}
+	if (inputState.keyboard.getKeyValue(SDL_SCANCODE_A))
+	{
+		angularSpeed -= sensitiveRota;
+	}
+	if (inputState.keyboard.getKeyValue(SDL_SCANCODE_D))
+	{
+		angularSpeed += sensitiveRota;
+	}
+
+	moveComponent->setForwardSpeed(forwardSpeed);
+	moveComponent->setAngularSpeed(angularSpeed);
+
+	/*Vector2 mousePosition = inputState.mouse.getPosition();
 	float x = mousePosition.x;
 	float y = mousePosition.y;
 	if (inputState.mouse.getButtonState(3) == ButtonState::Held)
@@ -79,7 +101,6 @@ void Player::actorInput(const struct InputState& inputState)
 			newPitchMovement *= maxOrbitSpeed;
 		}
 		getGame().getCamera()->setPitchMovement(newPitchMovement);
-		//pitchMovement = newPitchMovement;
-	}
-	*/
+		pitchMovement = newPitchMovement;
+	}*/
 }

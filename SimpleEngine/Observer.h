@@ -1,10 +1,16 @@
 #pragma once
 
-class Observer
+enum class Event
 {
-public:
-	virtual ~Observer() {}
-	//virtual void onNotify(const Entity& entity, Event event) = 0;
+	FIRST_EXPLORATION,
+	I_SEE_YOU
 };
 
+class Observer
+{
 
+public:
+
+	virtual ~Observer() {};
+	virtual void onNotify(Event event) = 0;
+};
