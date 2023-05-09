@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include "IRenderer.h"
 #include <Engine/Geometry/Rectangle.h>
 #include <SDL.h>
@@ -35,3 +35,4 @@ private:
 	std::vector<class SpriteComponent*> sprites;
 	SDL_Renderer* SDLRenderer = nullptr;
 };
+*/

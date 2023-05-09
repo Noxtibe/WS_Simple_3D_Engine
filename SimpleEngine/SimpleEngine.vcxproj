@@ -161,7 +161,6 @@
     <ClCompile Include="Engine\Geometry\Rectangle.cpp" />
     <ClCompile Include="Engine\RendererOGL.cpp" />
     <ClCompile Include="Engine\RendererSDL.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Shaders\Shader.cpp" />
     <ClCompile Include="Games\Asteroid\Ship.cpp" />
     <ClCompile Include="Engine\Geometry\Sphere.cpp" />
@@ -173,6 +172,7 @@
     <ClCompile Include="Engine\Maths\Vector3.cpp" />
     <ClCompile Include="Engine\Maths\VertexArray.cpp" />
     <ClCompile Include="Engine\Window.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Achievements.h" />

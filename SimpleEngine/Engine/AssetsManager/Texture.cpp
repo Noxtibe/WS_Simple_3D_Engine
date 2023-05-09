@@ -23,7 +23,7 @@ void Texture::unload()
 	}
 }
 
-bool Texture::loadSDL(RendererSDL& renderer, const string& filenameP)
+/*bool Texture::loadSDL(RendererSDL& renderer, const string& filenameP)
 {
 	filename = filenameP;
 	// Load from file
@@ -46,7 +46,7 @@ bool Texture::loadSDL(RendererSDL& renderer, const string& filenameP)
 	}
 	Log::info("Loaded texture " + filename);
 	return true;
-}
+}*/
 
 bool Texture::loadOGL(RendererOGL& renderer, const string& filenameP)
 {
